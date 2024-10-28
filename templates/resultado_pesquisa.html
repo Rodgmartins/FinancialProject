@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultado da Pesquisa</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Resultados da Pesquisa</h2>
+        {% if clientes %}
+            <table>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome da Empresa</th>
+                    <th>CNPJ</th>
+                    <th>Endereço</th>
+                    <th>Telefone</th>
+                    <th>E-mail</th>
+                    <th>Honorário</th>
+                </tr>
+                {% for cliente in clientes %}
+                <tr>
+                    <td>{{ cliente['id'] }}</td>
+                    <td>{{ cliente['nome_empresa'] }}</td>
+                    <td>{{ cliente['cnpj'] }}</td>
+                    <td>{{ cliente['endereco'] }}</td>
+                    <td>{{ cliente['telefone'] }}</td>
+                    <td>{{ cliente['email'] }}</td>
+                    <td>{{ cliente['honorario'] }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p>Nenhum cliente encontrado.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

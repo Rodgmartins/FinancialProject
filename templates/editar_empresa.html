@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Empresa</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script>
+        // Função para aplicar a máscara no campo de WhatsApp
+        function formatarWhatsApp(whatsapp) {
+            whatsapp = whatsapp.replace(/\D/g, "");  // Remove tudo que não for número
+            whatsapp = whatsapp.replace(/^(\d{2})(\d)/g, "($1) $2");  // Adiciona parênteses ao DDD
+            whatsapp = whatsapp.replace(/(\d{5})(\d{4})$/, "$1-$2");  // Adiciona o traço no número
+            return whatsapp;
+        }
+
+        function aplicarMascaraWhatsApp() {
+            var input = document.getElementById("whatsapp");
+            input.value = formatarWhatsApp(input.value);  // Aplica a máscara
+        }
+
+        // Limitar a entrada para 11 números no máximo
+        function limitarWhatsApp(event) {
+            var input = event.target;
+            input.value = input.value.replace(/\D/g, "");  // Remove tudo que não for número
+            if (input.value.length > 11) {
+                input.value = input.value.slice(0, 11);  // Limita a 11 números
+            }
+        }
+
+        // Formatar o campo de honorário com "R$"
+        function formatarHonorario() {
+            var honorario = document.getElementById("honorario");
+            var valor = honorario.value.replace(/[^\d,]/g, '');  // Remover tudo que não é número ou vírgula
+            if (valor) {
+                honorario.value = "R$ " + parseFloat(valor.replace(',', '.')).toFixed(2).replace('.', ',');
+            }
+        }
+
+        // Permitir apenas números e vírgula no campo de honorário
+        function validarEntradaHonorario(event) {
+            var char = String.fromCharCode(event.which);
+            if (!/[0-9,]/.test(char)) {
+                event.preventDefault();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Editar Dados da Empresa</h1>
+        <form action="/atualizar_empresa/{{ empresa['id'] }}" method="POST">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="cnpj">CNPJ:</label>
+                    <input type="text" id="cnpj" name="cnpj" value="{{ empresa['cnpj'] }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="razao_social">Razão Social:</label>
+                    <input type="text" id="razao_social" name="razao_social" value="{{ empresa['razao_social'] }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nome_empresa">Nome Fantasia:</label>
+                    <input type="text" id="nome_empresa" name="nome_empresa" value="{{ empresa['nome_fantasia'] }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="inscricao_estadual">Inscrição Estadual:</label>
+                    <input type="text" id="inscricao_estadual" name="inscricao_estadual" value="{{ empresa['inscricao_estadual'] }}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="endereco">Endereço:</label>
+                    <input type="text" id="endereco" name="endereco" value="{{ empresa['endereco'] }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefone">Telefone:</label>
+                    <input type="text" id="telefone" name="telefone" value="{{ empresa['telefone'] }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="whatsapp">WhatsApp:</label>
+                    <input type="text" id="whatsapp" name="whatsapp" value="{{ empresa['whatsapp'] }}" maxlength="15" oninput="limitarWhatsApp(event)" onblur="aplicarMascaraWhatsApp()">
+                </div>
+                <div class="form-group">
+                    <label for="email">E-mail:</label>
+                    <input type="email" id="email" name="email" value="{{ empresa['email'] }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="responsavel">Responsável:</label>
+                    <input type="text" id="responsavel" name="responsavel" value="{{ empresa['responsavel'] }}">
+                </div>
+                <div class="form-group">
+                    <label for="senha_gov_br">Senha gov.br:</label>
+                    <input type="text" id="senha_gov_br" name="senha_gov_br" value="{{ empresa['senha_gov_br'] }}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="honorario">Honorário (R$):</label>
+                    <input type="text" id="honorario" name="honorario" value="{{ empresa['honorario'] }}" required onkeypress="validarEntradaHonorario(event)" onblur="formatarHonorario()">
+                </div>
+            </div>
+
+            <button type="submit" class="btn">Atualizar Empresa</button>
+        </form>
+
+        <a href="/" class="btn">Voltar para a Página Inicial</a>
+    </div>
+</body>
+</html>

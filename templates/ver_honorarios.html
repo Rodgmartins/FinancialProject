@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honorários por Ano</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Honorários por Ano</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ano</th>
+                    <th>Valor (R$)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for honorario in honorarios %}
+                <tr>
+                    <td>{{ honorario['ano'] }}</td>
+                    <td>R$ {{ honorario['valor'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="/" class="btn">Voltar</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selecionar Empresa</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Estilos personalizados */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .results-box {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        .results-box ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .results-box li {
+            padding: 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+            transition: background-color 0.2s ease;
+        }
+
+        .results-box li:hover {
+            background-color: #f4f4f4;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #999;
+            font-size: 16px;
+        }
+    </style>
+    <script>
+        function pesquisarEmpresa() {
+            const query = document.getElementById('empresa-search').value;
+            const resultsBox = document.getElementById('results');
+            const empresaList = document.querySelectorAll('.empresa-item');
+            let encontrou = false;
+
+            if (query.length > 0) {
+                empresaList.forEach(empresa => {
+                    if (empresa.textContent.toLowerCase().includes(query.toLowerCase())) {
+                        empresa.style.display = 'block';
+                        encontrou = true;
+                    } else {
+                        empresa.style.display = 'none';
+                    }
+                });
+
+                if (!encontrou) {
+                    resultsBox.innerHTML = '<div class="no-results">Nenhuma empresa encontrada</div>';
+                }
+            } else {
+                empresaList.forEach(empresa => {
+                    empresa.style.display = 'block';
+                });
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Selecionar Empresa para Planilha</h1>
+        
+        <!-- Campo de pesquisa de empresas -->
+        <div class="search-box">
+            <input type="text" id="empresa-search" oninput="pesquisarEmpresa()" placeholder="Pesquisar Empresa...">
+        </div>
+
+        <!-- Resultados da pesquisa e lista de empresas completa -->
+        <div class="results-box" id="results">
+            <ul>
+                {% for empresa in empresas %}
+                <li class="empresa-item" onclick="window.location.href = '/planilhas/{{ empresa.id }}'">
+                    {{ empresa.razao_social }} ({{ empresa.cnpj }})
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <a href="/" class="btn">Voltar para a Página Inicial</a>
+    </div>
+</body>
+</html>

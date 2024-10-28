@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisar Clientes</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Pesquisar Cliente</h1>
+        <form action="/pesquisar" method="POST">
+            <label for="termo_pesquisa">Nome da Empresa ou CNPJ:</label>
+            <input type="text" id="termo_pesquisa" name="termo_pesquisa" required>
+            <button type="submit">Pesquisar</button>
+        </form>
+    </div>
+</body>
+</html>

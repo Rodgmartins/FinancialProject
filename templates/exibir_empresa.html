@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados da Empresa</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Estilos de layout principais */
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+
+        /* Estilo dos títulos */
+        h1 {
+            text-align: center;
+            color: #333;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Estilo dos parágrafos */
+        p {
+            font-size: 18px;
+            margin: 10px 0;
+            font-family: 'Arial', sans-serif;
+            color: #555;
+        }
+
+        /* Botões */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Botão de edição */
+        .btn-edit {
+            background-color: #FF9800;
+        }
+        .btn-edit:hover {
+            background-color: #e68a00;
+        }
+
+        /* Botão de impressão */
+        .btn-imprimir {
+            background-color: #007BFF;
+            margin-left: auto;
+        }
+        .btn-imprimir:hover {
+            background-color: #0056b3;
+        }
+
+        /* Botão da planilha */
+        .btn-planilha {
+            background-color: #6C757D;
+            margin-top: 20px;
+        }
+
+        .btn-planilha:hover {
+            background-color: #5a6268;
+        }
+
+        /* Estilos de impressão */
+        @media print {
+            /* Esconder os botões na impressão */
+            .btn {
+                display: none;
+            }
+
+            /* Estilo de "cartão" para a impressão */
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background-color: #f9f9f9;
+            }
+
+            .container {
+                width: 70%;
+                padding: 30px;
+                border: 2px solid #000;
+                border-radius: 10px;
+                background-color: #fff;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                font-family: 'Georgia', serif;
+                page-break-inside: avoid;
+            }
+
+            h1 {
+                font-size: 24px;
+                color: #000;
+                border-bottom: 2px solid #000;
+                padding-bottom: 10px;
+                margin-bottom: 20px;
+            }
+
+            p {
+                font-size: 18px;
+                color: #333;
+                margin-bottom: 8px;
+            }
+
+            /* Bordas entre as informações da empresa */
+            p + p {
+                border-top: 1px solid #ccc;
+                padding-top: 8px;
+            }
+        }
+
+        /* Posicionamento dos botões */
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 20px;
+        }
+    </style>
+    <script>
+        // Função para imprimir os dados da empresa
+        function imprimirDadosEmpresa() {
+            window.print();
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Dados da Empresa</h1>
+        <p><strong>Razão Social:</strong> {{ empresa['razao_social'] }}</p>
+        <p><strong>Nome Fantasia:</strong> {{ empresa['nome_fantasia'] }}</p>
+        <p><strong>CNPJ:</strong> {{ empresa['cnpj'] }}</p>
+        <p><strong>Endereço:</strong> {{ empresa['endereco'] }}</p>
+        <p><strong>Telefone:</strong> {{ empresa['telefone'] }}</p>
+        <p><strong>WhatsApp:</strong> {{ empresa['whatsapp'] }}</p>
+        <p><strong>Email:</strong> {{ empresa['email'] }}</p>
+        <p><strong>Responsável:</strong> {{ empresa['responsavel'] }}</p>
+        <p><strong>Senha gov.br:</strong> {{ empresa['senha_gov_br'] }}</p>
+        <p><strong>Honorário:</strong> R$ {{ empresa['honorario'] }}</p>
+
+        <div class="btn-container">
+            <div class="btn-group">
+                <!-- Botão para acessar a planilha de cadastro -->
+                <a href="/planilha_cadastro/{{ empresa['id'] }}" class="btn btn-planilha">Ver Planilha de Cadastro</a>
+
+                <!-- Botão para editar os dados -->
+                <a href="/editar_empresa/{{ empresa['id'] }}" class="btn btn-edit">Editar Dados</a>
+
+                <!-- Botão para voltar à página inicial -->
+                <a href="/" class="btn">Voltar para a Página Inicial</a>
+            </div>
+
+            <!-- Botão para imprimir os dados -->
+            <button class="btn btn-imprimir" onclick="imprimirDadosEmpresa()">Imprimir</button>
+        </div>
+    </div>
+</body>
+</html>

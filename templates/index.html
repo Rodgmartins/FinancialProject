@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Inicial</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Estilo para o box que contém pesquisa e empresas cadastradas */
+        .empresa-box {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .empresa-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .empresa-item:last-child {
+            border-bottom: none;
+        }
+
+        .empresa-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Estilo para o campo de busca integrado no box */
+        .search-box {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        /* Estilos dos botões */
+        .btn-container {
+            display: flex;
+            justify-content: space-evenly;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin: 10px;
+            flex-basis: calc(50% - 20px);
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 600px) {
+            .btn {
+                flex-basis: 100%;
+            }
+        }
+    </style>
+    <script>
+        // Função para formatar CNPJ no padrão 00.000.000/0000-00
+        function formatarCNPJ(cnpj) {
+            return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, "$1.$2.$3/$4-$5");
+        }
+
+        // Função para buscar empresas com base no termo pesquisado
+        function buscarEmpresas() {
+            const termo = document.getElementById('nome_empresa').value;
+            const listaEmpresas = document.getElementById('listaEmpresas');
+            if (termo.length >= 2) {
+                fetch(`/autocomplete?query=${termo}`)
+                .then(response => response.json())
+                .then(data => {
+                    listaEmpresas.innerHTML = ''; // Limpa a lista de empresas cadastradas
+                    data.forEach(item => {
+                        const div = document.createElement('div');
+                        div.classList.add('empresa-item');
+                        div.innerText = `${item.nome_fantasia} (${formatarCNPJ(item.cnpj)})`;
+                        div.onclick = () => window.location.href = `/empresa/${item.id}`;
+                        listaEmpresas.appendChild(div);
+                    });
+                });
+            } else {
+                // Mostra todas as empresas quando o campo de busca estiver vazio
+                fetch(`/autocomplete?query=`)
+                .then(response => response.json())
+                .then(data => {
+                    listaEmpresas.innerHTML = '';
+                    data.forEach(item => {
+                        const div = document.createElement('div');
+                        div.classList.add('empresa-item');
+                        div.innerText = `${item.nome_fantasia} (${formatarCNPJ(item.cnpj)})`;
+                        div.onclick = () => window.location.href = `/empresa/${item.id}`;
+                        listaEmpresas.appendChild(div);
+                    });
+                });
+            }
+        }
+
+        // Mostra todas as empresas cadastradas ao carregar a página
+        window.onload = function() {
+            buscarEmpresas();
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Página Inicial - Escritório Contábil Medeiros</h1>
+
+        <!-- Box unificado contendo campo de pesquisa e empresas cadastradas -->
+        <div class="empresa-box">
+            <div class="search-box">
+                <input type="text" id="nome_empresa" name="nome_empresa" onkeyup="buscarEmpresas()" placeholder="Digite a razão social ou o CNPJ" required>
+            </div>
+            <!-- Box rolável com empresas cadastradas -->
+            <div id="listaEmpresas">
+                <!-- As empresas serão listadas aqui dinamicamente -->
+            </div>
+        </div>
+
+        <!-- Distribuição dos botões de opções -->
+        <div class="btn-container">
+            <a class="btn" href="/cadastro">Cadastro de Clientes</a>
+            <a class="btn" href="/honorarios">Honorários</a>
+            <a class="btn" href="/faturamento">Faturamento</a>
+            <a class="btn" href="/planilhas">Planilhas</a>
+            <!-- Novo botão para Planilha de Cadastro -->
+            <a class="btn" href="/planilha_cadastro">Planilha de Cadastro</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilha de Vendas - {{ empresa.razao_social }}</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Estilos personalizados */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .btn-save {
+            background-color: #2196F3;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn-print {
+            background-color: #FF9800;
+            margin-left: 10px;
+        }
+
+        /* Estilos para o box de pesquisa de empresas */
+        .search-box {
+            width: 300px;
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .results-box {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        .results-box ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .results-box li {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .results-box li:hover {
+            background-color: #f4f4f4;
+        }
+
+        tfoot td {
+            font-weight: bold;
+        }
+
+        /* Ocultar elementos ao imprimir */
+        @media print {
+            .btn {
+                display: none;
+            }
+        }
+    </style>
+    <script>
+        function calcularTotais() {
+            let totalVendas = 0;
+            let totalCompras = 0;
+            let totalServicos = 0;
+
+            document.querySelectorAll('.vendas').forEach(function (vendasCell) {
+                totalVendas += parseFloat(vendasCell.value) || 0;
+            });
+
+            document.querySelectorAll('.compras').forEach(function (comprasCell) {
+                totalCompras += parseFloat(comprasCell.value) || 0;
+            });
+
+            document.querySelectorAll('.servicos').forEach(function (servicosCell) {
+                totalServicos += parseFloat(servicosCell.value) || 0;
+            });
+
+            document.getElementById('total-vendas').innerText = totalVendas.toFixed(2);
+            document.getElementById('total-compras').innerText = totalCompras.toFixed(2);
+            document.getElementById('total-servicos').innerText = totalServicos.toFixed(2);
+        }
+
+        function salvarDados() {
+            document.getElementById('planilha-form').submit();
+        }
+
+        function imprimirPagina() {
+            window.print();
+        }
+
+        // Função para pesquisar empresas
+        function pesquisarEmpresa() {
+            const query = document.getElementById('empresa-search').value;
+            if (query.length > 2) {
+                fetch(`/autocomplete?query=${query}`)
+                .then(response => response.json())
+                .then(data => {
+                    let resultsBox = document.getElementById('results');
+                    resultsBox.innerHTML = '';
+                    let ul = document.createElement('ul');
+                    data.forEach(empresa => {
+                        let li = document.createElement('li');
+                        li.innerText = `${empresa.nome_fantasia} (${empresa.cnpj})`;
+                        li.onclick = () => window.location.href = `/planilhas/${empresa.id}`;
+                        ul.appendChild(li);
+                    });
+                    resultsBox.appendChild(ul);
+                });
+            }
+        }
+
+        // Função para calcular o total ao carregar a página
+        window.onload = function() {
+            calcularTotais();
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Planilha de Vendas - {{ empresa.razao_social }} ({{ empresa.cnpj }})</h1>
+        
+        <!-- Box de pesquisa de empresas -->
+        <div class="search-box">
+            <input type="text" id="empresa-search" oninput="pesquisarEmpresa()" placeholder="Pesquisar Empresa...">
+        </div>
+        <div class="results-box" id="results"></div>
+
+        <form id="planilha-form" method="POST" action="/planilhas/{{ empresa.id }}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mês</th>
+                        <th>Vendas</th>
+                        <th>Compras</th>
+                        <th>Serviços</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mes in meses %}
+                    <tr>
+                        <td>{{ mes.mes }}</td>
+                        <td><input type="number" class="vendas" name="{{ mes.mes }}_vendas" value="{{ mes.vendas }}" oninput="calcularTotais()"></td>
+                        <td><input type="number" class="compras" name="{{ mes.mes }}_compras" value="{{ mes.compras }}" oninput="calcularTotais()"></td>
+                        <td><input type="number" class="servicos" name="{{ mes.mes }}_servicos" value="{{ mes.servicos }}" oninput="calcularTotais()"></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td style="text-align: right;">Totais:</td>
+                        <td id="total-vendas">0.00</td>
+                        <td id="total-compras">0.00</td>
+                        <td id="total-servicos">0.00</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div style="display: flex; justify-content: flex-end;">
+                <button type="button" class="btn btn-save" onclick="salvarDados()">Salvar</button>
+                <button type="button" class="btn btn-print" onclick="imprimirPagina()">Imprimir</button>
+            </div>
+            <a href="/" class="btn">Voltar para a Tela Inicial</a>
+        </form>
+    </div>
+</body>
+</html>

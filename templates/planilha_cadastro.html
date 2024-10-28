@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planilha de Cadastro</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .empresa-info {
+            margin-bottom: 20px;
+        }
+
+        .empresa-info p {
+            font-size: 18px;
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .checkbox-column {
+            text-align: center;
+            width: 50px;
+        }
+
+        input[type="checkbox"] {
+            transform: scale(1.2);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn-print {
+            background-color: #2196F3;
+            margin-right: 10px;
+        }
+
+        .btn-print:hover {
+            background-color: #0b7dda;
+        }
+
+        /* Ocultar elementos na impressão */
+        @media print {
+            .btn {
+                display: none;
+            }
+        }
+    </style>
+    <script>
+        function imprimirPagina() {
+            window.print();
+        }
+
+        function atualizarTarefa(campo, clienteId, checkbox) {
+            var valor = checkbox.checked ? 'on' : 'off';
+
+            fetch(`/planilha_cadastro/${clienteId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `${campo}=${valor}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log(`${campo} atualizado com sucesso.`);
+                } else {
+                    console.error('Erro ao atualizar tarefa.');
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Planilha de Cadastro</h1>
+
+        <!-- Exibição da razão social e CNPJ da empresa -->
+        <div class="empresa-info">
+            <p><strong>Razão Social:</strong> {{ empresa['razao_social'] }}</p>
+            <p><strong>CNPJ:</strong> {{ empresa['cnpj'] }}</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Tarefa</th>
+                    <th class="checkbox-column">Feito</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>CREDENCIAMENTO SEFAZ</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('credenciamento_sefaz', {{ planilha['cliente_id'] }}, this)" {% if planilha['credenciamento_sefaz'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>SEFAZ - SEPD - LIVROS FISCAIS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('sefaz_sep', {{ planilha['cliente_id'] }}, this)" {% if planilha['sefaz_sep'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>SPED FISCAL - AVISAR O CARLOS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('sped_fiscal', {{ planilha['cliente_id'] }}, this)" {% if planilha['sped_fiscal'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>DCTF WEB - CARLOS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('dctf_web', {{ planilha['cliente_id'] }}, this)" {% if planilha['dctf_web'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>SAT</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('sat', {{ planilha['cliente_id'] }}, this)" {% if planilha['sat'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>APLICATIVO</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('aplicativo', {{ planilha['cliente_id'] }}, this)" {% if planilha['aplicativo'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>PROCURAÇÃO RFB</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('procuracao_rfb', {{ planilha['cliente_id'] }}, this)" {% if planilha['procuracao_rfb'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>PROCURAÇÃO FGTS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('procuracao_fgts', {{ planilha['cliente_id'] }}, this)" {% if planilha['procuracao_fgts'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>CERTIFICADO DIGITAL</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('certificado_digital', {{ planilha['cliente_id'] }}, this)" {% if planilha['certificado_digital'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>SENHA - POSTO FISCAL ELETRÔNICO</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('senha_post_fiscal', {{ planilha['cliente_id'] }}, this)" {% if planilha['senha_post_fiscal'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>SENHA WEB</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('senha_web', {{ planilha['cliente_id'] }}, this)" {% if planilha['senha_web'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>LICENÇA FUNCIONAMENTO DA PMSP</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('licenca_pms', {{ planilha['cliente_id'] }}, this)" {% if planilha['licenca_pms'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>CADASTRO NO FGTS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('cadastro_fgts', {{ planilha['cliente_id'] }}, this)" {% if planilha['cadastro_fgts'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>MATRÍCULA NO INSS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('matricula_inss', {{ planilha['cliente_id'] }}, this)" {% if planilha['matricula_inss'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>PERFIL NO CCM PARA EMISSÃO DE NFS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('perfil_ccm', {{ planilha['cliente_id'] }}, this)" {% if planilha['perfil_ccm'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>CADASTRO DO LIXO</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('cadastro_lixo', {{ planilha['cliente_id'] }}, this)" {% if planilha['cadastro_lixo'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>INCLUIR CONTABILISTA NA SEFAZ</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('incluir_contabilista', {{ planilha['cliente_id'] }}, this)" {% if planilha['incluir_contabilista'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>INCLUIR NA RELAÇÃO DOS SINDICATOS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('incluir_sindicatos', {{ planilha['cliente_id'] }}, this)" {% if planilha['incluir_sindicatos'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>DESTDA - INCLUIR NA RELAÇÃO</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('destda', {{ planilha['cliente_id'] }}, this)" {% if planilha['destda'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>SÓCIOS IMPOSTO DE RENDA PESSOA FÍSICA</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('socios_irpf', {{ planilha['cliente_id'] }}, this)" {% if planilha['socios_irpf'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>PEGAR O NÚMERO DO PIS DOS SÓCIOS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('pis_socios', {{ planilha['cliente_id'] }}, this)" {% if planilha['pis_socios'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>ABRIR FICHA PARA FAZER DARFS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('ficha_darf', {{ planilha['cliente_id'] }}, this)" {% if planilha['ficha_darf'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>CADASTRAR HONORÁRIOS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('cadastrar_honorarios', {{ planilha['cliente_id'] }}, this)" {% if planilha['cadastrar_honorarios'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>CADASTRAR PLANILHA DE DARF</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('cadastrar_planilha_darf', {{ planilha['cliente_id'] }}, this)" {% if planilha['cadastrar_planilha_darf'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>PASTA SUSPENSA PARA (CONTRATO SOCIAL, ETC)</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('pasta_suspensa_contrato', {{ planilha['cliente_id'] }}, this)" {% if planilha['pasta_suspensa_contrato'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>PASTA SUSPENSA PARA PLANILHA CONTABILIDADE</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('pasta_suspensa_contabilidade', {{ planilha['cliente_id'] }}, this)" {% if planilha['pasta_suspensa_contabilidade'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>PASTA SUSPENSA PARA BALANÇO</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('pasta_suspensa_balanco', {{ planilha['cliente_id'] }}, this)" {% if planilha['pasta_suspensa_balanco'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>PASTA SUSPENSA PARA GUARDAR DARFS PAGOS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('pasta_suspensa_darf', {{ planilha['cliente_id'] }}, this)" {% if planilha['pasta_suspensa_darf'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>PASTA SUSPENSA PARA LIVRO 57</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('livro_57', {{ planilha['cliente_id'] }}, this)" {% if planilha['livro_57'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>LIVRO MODELO 6</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('livro_modelo_6', {{ planilha['cliente_id'] }}, this)" {% if planilha['livro_modelo_6'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>AVISAR DP SOBRE NOVOS PRO LABORES</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('avisar_dp', {{ planilha['cliente_id'] }}, this)" {% if planilha['avisar_dp'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>PLANILHA SETORISTA CORRESPONDENTE</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('planilha_setorista', {{ planilha['cliente_id'] }}, this)" {% if planilha['planilha_setorista'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>SE FOR (R.P.A) FAZER AS GIAs MENSAIS - CARLOS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('rpa_gias', {{ planilha['cliente_id'] }}, this)" {% if planilha['rpa_gias'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>NOTAS FISCAIS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('notas_fiscais', {{ planilha['cliente_id'] }}, this)" {% if planilha['notas_fiscais'] %} checked {% endif %}></td>
+                </tr>
+                <tr>
+                    <td>QUADRO DE DOCUMENTOS</td>
+                    <td class="checkbox-column"><input type="checkbox" onclick="atualizarTarefa('quadro_documentos', {{ planilha['cliente_id'] }}, this)" {% if planilha['quadro_documentos'] %} checked {% endif %}></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <button class="btn btn-print" onclick="imprimirPagina()">Imprimir</button>
+        <a href="/" class="btn">Voltar para a Tela Inicial</a>
+    </div>
+</body>
+</html>

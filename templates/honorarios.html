@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Honorários dos Clientes</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Estilos para a tabela */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 16px;
+            text-align: center;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Estilos do box de pesquisa e empresas */
+        .empresa-box {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .empresa-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .empresa-item:last-child {
+            border-bottom: none;
+        }
+        .empresa-item:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Botões estilizados */
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        /* Botão de imprimir posicionado à direita */
+        .btn-print {
+            background-color: #2196F3;
+            margin-top: 30px;
+            position: absolute;
+            right: 20px;
+        }
+        .btn-print:hover {
+            background-color: #0b7dda;
+        }
+
+        /* Ocultar elementos na impressão */
+        @media print {
+            .btn, .btn-print, form {
+                display: none;
+            }
+        }
+
+        /* Posicionamento container */
+        .container {
+            position: relative;
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+    </style>
+    <script>
+        function atualizarPagamento(clienteId, mes, ano, checkbox) {
+            var pago = checkbox.checked ? 'on' : 'off';
+            fetch("/honorarios", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: `cliente_id=${clienteId}&mes=${mes}&ano=${ano}&pago=${pago}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Pagamento atualizado com sucesso.');
+                } else {
+                    console.error('Erro ao atualizar pagamento.');
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+
+        // Função para imprimir a página
+        function imprimirPagina() {
+            window.print();
+        }
+
+        // Função para buscar empresas
+        function buscarEmpresas() {
+            const termo = document.getElementById('nome_empresa').value.toLowerCase();
+            const linhas = document.querySelectorAll('.linha-empresa');
+            let empresaEncontrada = false;
+
+            // Esconde todas as empresas
+            linhas.forEach(linha => {
+                const nomeEmpresa = linha.querySelector('.nome-empresa').innerText.toLowerCase();
+                if (nomeEmpresa.includes(termo)) {
+                    linha.style.display = ''; // Mostra a linha se a empresa for encontrada
+                    empresaEncontrada = true;
+                } else {
+                    linha.style.display = 'none'; // Esconde as outras
+                }
+            });
+
+            if (!empresaEncontrada && termo.length >= 2) {
+                document.getElementById('listaEmpresas').style.display = 'none';
+            } else if (termo.length < 2) {
+                document.getElementById('listaEmpresas').style.display = 'block'; // Mostra a lista se não estiver pesquisando
+                linhas.forEach(linha => linha.style.display = ''); // Reseta a exibição de todas as empresas
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center;">Honorários dos Clientes</h1>
+
+        <!-- Box unificado com busca e lista de empresas -->
+        <div class="empresa-box">
+            <input type="text" id="nome_empresa" name="nome_empresa" onkeyup="buscarEmpresas()" placeholder="Digite a razão social ou o CNPJ" required>
+        </div>
+
+        <!-- Seleção do ano -->
+        <form method="GET" action="/honorarios">
+            <label for="ano">Selecione o ano:</label>
+            <select name="ano" id="ano" onchange="this.form.submit()">
+                {% for ano in anos %}
+                <option value="{{ ano }}" {% if ano == ano_selecionado %} selected {% endif %}>{{ ano }}</option>
+                {% endfor %}
+            </select>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome da Empresa</th>
+                    <!-- Exibir os meses de 01 até 12 -->
+                    {% for mes in meses %}
+                    <th>{{ mes }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for cliente in honorarios %}
+                <tr class="linha-empresa">
+                    <td class="nome-empresa">{{ cliente['nome_fantasia'] }}</td>
+                    <!-- Criar uma célula para cada mês -->
+                    {% for mes in meses %}
+                    <td>
+                        <input type="checkbox" onclick="atualizarPagamento({{ cliente['id'] }}, '{{ mes }}', '{{ ano_selecionado }}', this)" 
+                        {% if cliente[mes] %} checked {% endif %}>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Botão para imprimir no rodapé -->
+        <button class="btn btn-print" onclick="imprimirPagina()">Imprimir</button>
+
+        <a href="/" class="btn">Voltar para a Tela Inicial</a>
+    </div>
+</body>
+</html>
